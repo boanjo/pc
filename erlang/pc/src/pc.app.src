@@ -1,0 +1,12 @@
+{application, pc,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { pc_app, [normal, 0]}},
+  {env, []}
+ ]}.

@@ -1,22 +1,27 @@
 #include <OneWire.h>
 #include <LiquidCrystal.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 LiquidCrystal lcd(8,9,10,11,12,13);
 OneWire  ds(7); 
-// the value of the 'other' resistor
+// the valuese of the 'other' resistor
+
 #define SERIES_RESISTOR 560    
 
-#define WATER_LEVEL_PIN A0 
-#define FLOW_SENSOR_PIN 2
-#define RAIN_GAUGE_PIN 6
-#define WATER_CONTROL_PIN 4
+#define WATER_LEVEL_PIN   A0 
+#define FLOW_SENSOR_PIN   2
 #define FEED_PIN          3
+#define WATER_CONTROL_PIN 4
+#define RAIN_GAUGE_PIN    6
+
 #define STATE_TEMP_READ 1 
 #define STATE_TEMP_MEAS 2 
+
 #define STATE_WATER_ON 0
 #define STATE_WATER_OFF 1
+
 #define NO_OF_LEVEL_AVERAGE_ITEMS  8
+
 #define MODE_WATER_MANUAL 0
 #define MODE_WATER_AUTOMATIC 1
 
@@ -78,6 +83,7 @@ void setup(void) {
   lcd.begin(16,4);
   digitalWrite(WATER_CONTROL_PIN, LOW);
   pinMode(WATER_CONTROL_PIN, OUTPUT);
+  digitalWrite(FEED_PIN, LOW);
   pinMode(FEED_PIN, OUTPUT);
 
   pinMode(RAIN_GAUGE_PIN, INPUT);
@@ -106,16 +112,6 @@ int getSerialValue(String str)
   return subStr.toInt();
 }
 
-void feed(int pulses)
-{
-  for(int i = 0; i < pulses; i++)
-  {
-    digitalWrite(FEED_PIN, LOW);
-    delayMicroseconds(19150);
-    digitalWrite(FEED_PIN, HIGH);
-    delayMicroseconds(850);
-  }
-}
 
 void loop(void) {
   byte present = 0;
@@ -125,7 +121,7 @@ void loop(void) {
   char litersStr[8];
   char levelStr[8];
   float waterLevel;
-  float waterLevelAvg;
+  float waterLevelAvg = 0;
   byte badTempReading = false;
   char inChar;
   float rain = 0;
@@ -208,10 +204,16 @@ void loop(void) {
     liters /= 8.1;
     liters -= 6;
     liters /= 60.0;
+
+    if(liters < 0) liters = 0;
     dtostrf(liters,7,1,litersStr);
 
     // Calculate the Water level in pond
     waterLevel = analogRead(WATER_LEVEL_PIN);
+
+
+    //    Serial.println(waterLevel, DEC);
+
     // convert the value to resistance
     waterLevel = (1023 / waterLevel)  - 1;
     waterLevel = SERIES_RESISTOR / waterLevel;
@@ -270,10 +272,28 @@ void loop(void) {
     Serial.print("Flow="); Serial.println(litersStr);
     Serial.print("FlowPulses=");Serial.println(flowPulses, DEC);
     Serial.print("Level="); Serial.println(levelStr);
+    if (waterState==STATE_WATER_ON) 
+      Serial.println("Water=on");
+    else 
+      Serial.println("Water=off");
     Serial.println("#");
 
   }
 }
+
+void feed(int pulses)
+{
+  for(int i = 0; i < pulses; i++)
+  {
+    digitalWrite(FEED_PIN, LOW);
+    delay(20);
+    //   delayMicroseconds(10000);
+    digitalWrite(FEED_PIN, HIGH);
+    delay(1);
+  }
+  digitalWrite(FEED_PIN, LOW);
+}
+
 
 void ReadTempSensor() 
 {

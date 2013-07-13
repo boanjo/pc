@@ -5,7 +5,7 @@
 
 init(File) ->
     {ok, Fd} = file:open(File, write),
-    io:format(Fd, "~p~n", [erlang:localtime()]),
+    io:format(Fd, "~p~nh", [erlang:localtime()]),
     {ok, Fd}.
 
 handle_event(Msg, Fd) ->
