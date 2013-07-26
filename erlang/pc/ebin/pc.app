@@ -1,9 +1,0 @@
-{application,pc,
-             [{description,[]},
-              {vsn,"1"},
-              {registered,[]},
-              {applications,[kernel,stdlib]},
-              {mod,{pc_app,[]}},
-              {env,[]},
-              {modules,[file_logger,pc_app,pc_sup,serial,serial_file_logger,
-                        serial_terminal_logger,terminal_logger]}]}.
