@@ -45,11 +45,11 @@ put_char(Handle, []) ->
     
 
 notify_mysql(Msg) ->
-    case whereis(mysql) of % Test if the client is running
+    case whereis(mysql_handler) of % Test if the client is running
         undefined ->
             no_mysql;
         _ -> 
-	    mysql ! {serial_msg, Msg},
+	    mysql_handler ! {serial_msg, Msg},
 	    ok
     end.
 

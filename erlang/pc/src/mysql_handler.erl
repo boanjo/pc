@@ -17,7 +17,7 @@
 	}). 
 
 
--define(TIMEOUT, 1*60*1000).
+-define(TIMEOUT, 15*60*1000).
 
 start() ->
     crypto:start(),
@@ -26,11 +26,11 @@ start() ->
 		    "pc_epkboan_net", "Marigt123", "remote-mysql3.servage.net", 3306,
 		    "pc_epkboan_net", utf8),
     Pid = spawn(?MODULE, init, []),
-    register(mysql, Pid),
+    register(mysql_handler, Pid),
     Pid.
 
 select() ->
-    Result = emysql:execute(mysql_pool,
+    Result = emysql:execute(pond_pool,
 			    <<"select * from pc_epkboan_net.pond_event order by id desc limit 1">>),
     
     io:format("~n~p~n", [Result]).
@@ -54,6 +54,15 @@ init() ->
       water_on_time=0
      },
     
+
+    gen_event:start({local, confirmation_monitor}),
+    gen_event:add_handler(confirmation_monitor, file_logger, ["/home/pi/conf.txt"]),
+
+    gen_event:start({local, mysql_monitor}),
+    gen_event:add_handler(mysql_monitor, file_logger, ["/home/pi/mysql.txt"]),
+
+    ets:new(current_pond_status, [set, named_table]),
+
     timer:send_after(?TIMEOUT, timer),
     loop(Data),
     ok.   
@@ -102,17 +111,29 @@ water_time_at_tmo(Curr) ->
 handle_string(Curr, Key, Value) ->
     case Key of
 	"Rain" ->
-	    Curr#state{rain=list_to_float(trim_ws(Value))};
+	    Rain = list_to_float(trim_ws(Value)),
+	    ets:insert(current_pond_status, {rain, Rain}),
+	    ets:insert(current_pond_status, 
+		       {time, pc_utils:get_time_str(calendar:local_time())}), 
+	    Curr#state{rain=Rain};
 	"Flow" ->
-	    Curr#state{flow=list_to_float(trim_ws(Value))};
+	    Flow = list_to_float(trim_ws(Value)),
+	    ets:insert(current_pond_status, {flow, Flow}),
+	    Curr#state{flow=Flow};
 	"Temp" ->
 	    L = Curr#state.temp,
-	    Curr#state{temp=[list_to_float(trim_ws(Value))|L]};
+	    Temp = list_to_float(trim_ws(Value)),
+	    ets:insert(current_pond_status, {temp, Temp}),
+	    Curr#state{temp=[Temp|L]};
 	"Level" ->
 	    L = Curr#state.level,
-	    Curr#state{level=[list_to_float(trim_ws(Value))|L]};
+	    Level = list_to_float(trim_ws(Value)),
+	    ets:insert(current_pond_status, {level, Level}),
+	    Curr#state{level=[Level|L]};
 	"Water" ->
-	    water_state(Curr, list_to_atom(trim_ws(Value)));
+	    State = list_to_existing_atom(trim_ws(Value)),
+	    ets:insert(current_pond_status, {state, State}),
+	    water_state(Curr, State);
 	_ ->
 	    Curr
 		
@@ -122,12 +143,15 @@ loop(Curr) ->
     receive
 	{serial_msg, Str} ->
 	    Parts = re:split(Str, "=", [{return,list}]),
-	    io:format("Str = ~p~n", [Str]),
+	   %% io:format("Str = ~p~n", [Str]),
 	    case length(Parts) of
 		2 ->
 		    [P1, P2] = Parts,
 		    NewCurr = handle_string(Curr, P1, P2),
 		    loop(NewCurr);
+		3 -> 
+		    gen_event:notify(confirmation_monitor, Str),
+		    loop(Curr);
 		_ ->
 		    loop(Curr)
 	    end;
@@ -135,23 +159,34 @@ loop(Curr) ->
 	timer ->
 	    timer:send_after(?TIMEOUT, timer),
 	    Upd = water_time_at_tmo(Curr),
-	    io:format("rain ~p~n", [Upd]),
+	    gen_event:notify(mysql_monitor, Upd),
+	    %%io:format("tmo ~p~n", [Upd]),
 	    Rain = Upd#state.rain - Upd#state.old_rain,
+%%	    io:format("1.", []),
 	    Flow = Upd#state.flow - Upd#state.old_flow,
+%%	    io:format("2.", []),
 	    WaterTime = Upd#state.water_on_time,
+%%	    io:format("3.", []),
 	    Temp = get_middle(Upd#state.temp),
+%%	    io:format("4.", []),
 	    Level = get_middle(Upd#state.level),
+%%	    io:format("5.", []),
 
 	    Now = calendar:local_time(),
-	    Date = get_date_str(Now),
-	    Time = get_time_str(Now),
+%%	    io:format("6.", []),
+	    Date = pc_utils:get_date_str(Now),
+%%	    io:format("7.", []),
+	    Time = pc_utils:get_time_str(Now),
+%%	    io:format("8. ~p~p~p~p~p~p~p~n", [Date, Time, Rain, Flow, Temp, Level, WaterTime]),
 	    
 	    emysql:prepare(my_insert,
 			   <<"INSERT INTO pond_event SET date=?, time=?, rain=?, flow=?, temp=?, level=?, water_time=?">>),
 	    	    
 	    Result = emysql:execute(pond_pool, my_insert, [Date, Time, Rain, Flow, Temp, Level, WaterTime]),
 
-%%	    io:format("Printout ~p~n", [Result]),
+	    %%io:format("Printout ~p~n", [Result]),
+	    gen_event:notify(mysql_monitor, Result),
+	    
 	    
 	    NewRain = Upd#state.rain,
 	    NewFlow = Upd#state.flow,
@@ -178,9 +213,4 @@ get_middle(List) ->
     Item = lists:nth(Len div 2, SortedList),
     Item.
 
-get_time_str({{_,_,_},{H, M, S}}) ->
-    io_lib:format('~2..0b:~2..0b:~2..0b', [H, M, S]).
-
-get_date_str({{Y, M, D}, {_,_,_}}) ->
-    io_lib:format('~4..0b:~2..0b:~2..0b', [Y, M, D]).
     

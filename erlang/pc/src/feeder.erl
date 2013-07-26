@@ -40,7 +40,8 @@ next_day({Date, Time}) ->
 loop() ->
     receive
 	feed ->
-	    serial:send("feed=40"),
+	    serial:send("feed=80"),
+	    timer:send_after(24*60*60*1000, feed),
 	    io:format("Feeding!~n", []),
 	    loop();
 	_ ->
