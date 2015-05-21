@@ -1,18 +1,17 @@
 #include <OneWire.h>
-#include <LiquidCrystal.h>
 #include <stdlib.h>
+#include <SoftwareSerial.h>
 
-LiquidCrystal lcd(8,9,10,11,12,13);
-OneWire  ds(7); 
+SoftwareSerial mySerial(2, 3); // RX, TX
+OneWire  ds(4); 
 // the valuese of the 'other' resistor
 
 #define SERIES_RESISTOR 560    
 
-#define WATER_LEVEL_PIN   A0 
-#define FLOW_SENSOR_PIN   2
-#define FEED_PIN          3
-#define WATER_CONTROL_PIN 4
-#define RAIN_GAUGE_PIN    6
+#define WATER_LEVEL_PIN   A1 
+#define FLOW_SENSOR_PIN   9
+#define FEED_PIN          8
+#define WATER_CONTROL_PIN 5
 
 #define STATE_TEMP_READ 1 
 #define STATE_TEMP_MEAS 2 
@@ -36,28 +35,19 @@ long previousMillis = 0;        // will store last time LED was updated
 float celsius = 0.0;
 
 String inputString = "";         // a string to hold incoming data
-
+String phInput = ""; 
+String phStr = ""; 
 long waterLevelLow = 100;
-long waterLevelHigh = 120;
+long waterLevelHigh = 110;
 
 
 volatile uint32_t flowPulses = 0;
 volatile uint8_t lastFlowPinState = LOW;
 
-volatile uint32_t rainGaugePulses = 0;
-volatile uint8_t lastRainGaugePinState = HIGH;
-
 // Interrupt is called once a millisecond, looks for any pulses from the sensor!
 SIGNAL(TIMER0_COMPA_vect) {
 	
-  uint8_t x  = digitalRead(RAIN_GAUGE_PIN);
-  if((x == LOW) && (lastRainGaugePinState == HIGH))
-  {
-    rainGaugePulses++;
-  }
-  lastRainGaugePinState = x;
-	
-  x = digitalRead(FLOW_SENSOR_PIN);
+  uint8_t x = digitalRead(FLOW_SENSOR_PIN);
 	
   if((x == HIGH) && (lastFlowPinState == LOW)) {
     //low to high transition!
@@ -80,13 +70,12 @@ void useInterrupt(boolean v) {
 
 void setup(void) {
   Serial.begin(9600);
-  lcd.begin(16,4);
+  mySerial.begin(9600);
   digitalWrite(WATER_CONTROL_PIN, LOW);
   pinMode(WATER_CONTROL_PIN, OUTPUT);
   digitalWrite(FEED_PIN, LOW);
   pinMode(FEED_PIN, OUTPUT);
 
-  pinMode(RAIN_GAUGE_PIN, INPUT);
   pinMode(WATER_LEVEL_PIN, INPUT);
   pinMode(FLOW_SENSOR_PIN, INPUT);
   digitalWrite(FLOW_SENSOR_PIN, HIGH);
@@ -98,7 +87,6 @@ void setup(void) {
 
   if (!ds.search(addr)) 
   {
-    lcd.setCursor(0,0);
     Serial.println("No more addresses.");
     ds.reset_search();
     delay(250);
@@ -108,7 +96,7 @@ void setup(void) {
 
 int getSerialValue(String str) 
 {
-  String subStr = str.substring(str.indexOf("=")+1, str.length());
+  String subStr = str.substring(str.indexOf(",")+1, str.length());
   return subStr.toInt();
 }
 
@@ -117,58 +105,80 @@ void loop(void) {
   byte present = 0;
   byte type_s;
   char tempStr[8];
-  char rainStr[8];
   char litersStr[8];
   char levelStr[8];
   float waterLevel;
   float waterLevelAvg = 0;
   byte badTempReading = false;
   char inChar;
-  float rain = 0;
+
+  // HW SW serial
+  if (mySerial.available())
+  {
+    char ch = mySerial.read();
+    if(ch == '\r')
+    {	  
+      phStr = phInput;
+      phInput = "";
+    }
+    else 
+    {
+      phInput += ch; 
+    }
+  }
+
+  // USB HW serial
   if (Serial.available() > 0) 
   {
-    // read the incoming byte:
     inChar = Serial.read();
 		
-    if (inChar == '\n') 
+    if (inChar == '{') 
     {
-      if(inputString.indexOf("waterLevelLow") != -1)
+      inputString = "";
+    } 
+    else if (inChar == '}') 
+    {
+      if(inputString.length() > 0) {
+
+	if(inputString.indexOf("water_level_low") != -1)
       {
 	waterLevelLow = getSerialValue(inputString);
-	Serial.print("waterLevelLow = "); Serial.println(waterLevelLow, DEC);
       }
-      else if(inputString.indexOf("waterLevelHigh") != -1) 
+      else if(inputString.indexOf("water_level_high") != -1) 
       {
 	waterLevelHigh = getSerialValue(inputString);
-	Serial.print("waterLevelHigh = "); Serial.println(waterLevelHigh, DEC);
       }
       else if(inputString.indexOf("feed") != -1) 
       {
 	int pulses = getSerialValue(inputString);
 	feed(pulses);
       }
-      else if(inputString.indexOf("waterOn") != -1) 
+      else if(inputString.indexOf("water") != -1) 
       {
-	digitalWrite(WATER_CONTROL_PIN, HIGH);
-	waterState = STATE_WATER_ON;
-      }
-      else if(inputString.indexOf("waterOff") != -1) 
-      {
-	digitalWrite(WATER_CONTROL_PIN, LOW);
-	waterState = STATE_WATER_OFF;
-      }
-      else if(inputString.indexOf("waterManual") != -1) 
-      {
-	waterMode = MODE_WATER_MANUAL;
-      }
-      else if(inputString.indexOf("waterAutomatic") != -1) 
-      {
-	waterMode = MODE_WATER_AUTOMATIC;
-      }
+	String subCmd = inputString.substring(inputString.indexOf(",")+1, inputString.length());
 
-      Serial.print("Received = "); Serial.println(inputString);
+	if(subCmd.indexOf("off") != -1)
+	{
+	  digitalWrite(WATER_CONTROL_PIN, LOW);
+	  waterState = STATE_WATER_OFF;
+	}
+	else if(subCmd.indexOf("on") != -1)
+	{
+	  digitalWrite(WATER_CONTROL_PIN, HIGH);
+	  waterState = STATE_WATER_ON;
+	}
+	else if(subCmd.indexOf("man") != -1)
+	{
+	  waterMode = MODE_WATER_MANUAL;
+	}
+	else if(subCmd.indexOf("auto") != -1)
+	{
+	  waterMode = MODE_WATER_AUTOMATIC;
+	}
+      }
 
       inputString = "";
+      }
     } 
     else
     {
@@ -194,10 +204,6 @@ void loop(void) {
     // Temperature
     ReadTempSensor(); 
     dtostrf(celsius,5,1,tempStr);
-
-    // Calculate rain in mm
-    rain = rainGaugePulses * 0.2794;
-    dtostrf(rain,6,2,rainStr);
 
     // Calculate amount of added water in liters  
     float liters = flowPulses;
@@ -251,33 +257,31 @@ void loop(void) {
 
     dtostrf(waterLevelAvg,5,1,levelStr);
 
-    //########## LCD ######################
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Temp:"); lcd.print(tempStr);lcd.print((char)223);lcd.print("C");
-		
-    lcd.setCursor(0, 1);
-    lcd.print("Rain:");lcd.print(rainStr);lcd.print("mm");
-		
-    lcd.setCursor(-4, 2);
-    lcd.print("Liters:");lcd.print(litersStr);
-		
-    lcd.setCursor(-4, 3);
-    lcd.print("Level:"); lcd.print(levelStr); lcd.print("mm");
+    long time = millis();
 
     //######### SERIAL SEND ################
-    Serial.print("Temp="); Serial.println(tempStr);
-    Serial.print("Rain="); Serial.println(rainStr);
-    Serial.print("RainPulses="); Serial.println(rainGaugePulses, DEC);
-    Serial.print("Flow="); Serial.println(litersStr);
-    Serial.print("FlowPulses=");Serial.println(flowPulses, DEC);
-    Serial.print("Level="); Serial.println(levelStr);
-    if (waterState==STATE_WATER_ON) 
-      Serial.println("Water=on");
-    else 
-      Serial.println("Water=off");
-    Serial.println("#");
+    Serial.print("{ph,"); Serial.print(phStr); Serial.println("}.");
+    Serial.print("{temp,"); Serial.print(tempStr); Serial.println("}.");
+    Serial.print("{flow,"); Serial.print(litersStr); Serial.print(","); Serial.print(flowPulses, DEC); Serial.println("}.");
+    Serial.print("{level,"); Serial.print(levelStr); Serial.println("}.");
 
+    Serial.print("{water,"); 
+    if (waterMode==MODE_WATER_AUTOMATIC) 
+      Serial.print("auto");
+    else 
+      Serial.print("manual");
+    Serial.print(",");
+    if (waterState==STATE_WATER_ON) 
+      Serial.print("on");
+    else 
+      Serial.print("off");
+    Serial.println("}.");
+
+    long diff = millis() - time;
+    Serial.print("{cmd_time,");        
+    Serial.print(diff);
+    Serial.println("}.");
+    
   }
 }
 

@@ -1,4 +1,3 @@
-
 -module(pc_sup).
 
 -behaviour(supervisor).
@@ -24,5 +23,6 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, []} }.
+    PcServer = ?CHILD(pc_server, worker),
+    {ok, { {one_for_one, 5, 10}, [PcServer]} }.
 
