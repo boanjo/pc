@@ -1,16 +1,19 @@
 #include <OneWire.h>
 #include <stdlib.h>
 #include <SoftwareSerial.h>
+#include <ctype.h>
 
-SoftwareSerial mySerial(2, 3); // RX, TX
+SoftwareSerial mySerial(9, 3); // RX, TX
 OneWire  ds(4); 
 // the valuese of the 'other' resistor
 
 #define SERIES_RESISTOR 560    
 
 #define WATER_LEVEL_PIN   A1 
-#define FLOW_SENSOR_PIN   9
+#define FLOW_SENSOR_PIN   2
 #define FEED_PIN          8
+#define SPRINKLER_2_CONTROL_PIN 7
+#define SPRINKLER_1_CONTROL_PIN 6
 #define WATER_CONTROL_PIN 5
 
 #define STATE_TEMP_READ 1 
@@ -28,6 +31,8 @@ float levelArray[NO_OF_LEVEL_AVERAGE_ITEMS];
 long levelAvgCnt = 0;
 byte waterMode = MODE_WATER_AUTOMATIC;
 byte waterState = STATE_WATER_OFF;
+byte sprinkler1State = STATE_WATER_OFF;
+byte sprinkler2State = STATE_WATER_OFF;
 byte state = STATE_TEMP_MEAS;
 byte addr[8];
 long interval = 1000;           // interval at which to blink (milliseconds)
@@ -69,10 +74,17 @@ void useInterrupt(boolean v) {
 }
 
 void setup(void) {
-  Serial.begin(9600);
+  Serial.begin(115200);
   mySerial.begin(9600);
   digitalWrite(WATER_CONTROL_PIN, LOW);
   pinMode(WATER_CONTROL_PIN, OUTPUT);
+
+  digitalWrite(SPRINKLER_1_CONTROL_PIN, LOW);
+  pinMode(SPRINKLER_1_CONTROL_PIN, OUTPUT);
+
+  digitalWrite(SPRINKLER_2_CONTROL_PIN, LOW);
+  pinMode(SPRINKLER_2_CONTROL_PIN, OUTPUT);
+
   digitalWrite(FEED_PIN, LOW);
   pinMode(FEED_PIN, OUTPUT);
 
@@ -83,11 +95,11 @@ void setup(void) {
 	
   useInterrupt(true);
 
-  Serial.println("Starting");
+  Serial.println("{msg, starting}.");
 
   if (!ds.search(addr)) 
   {
-    Serial.println("No more addresses.");
+    Serial.println("{msg, no_more_addresses}.");
     ds.reset_search();
     delay(250);
   }
@@ -123,7 +135,14 @@ void loop(void) {
     }
     else 
     {
-      phInput += ch; 
+      if(isdigit(ch) || (ch == '.'))
+      {
+	phInput += ch; 
+      }
+      else 
+      {
+	phInput = "";
+      }
     }
   }
 
@@ -167,13 +186,48 @@ void loop(void) {
 	  digitalWrite(WATER_CONTROL_PIN, HIGH);
 	  waterState = STATE_WATER_ON;
 	}
-	else if(subCmd.indexOf("man") != -1)
+      }
+      else if(inputString.indexOf("auto_level") != -1) 
+      {
+	String subCmd = inputString.substring(inputString.indexOf(",")+1, inputString.length());
+
+	if(subCmd.indexOf("off") != -1)
 	{
 	  waterMode = MODE_WATER_MANUAL;
 	}
-	else if(subCmd.indexOf("auto") != -1)
+	else if(subCmd.indexOf("on") != -1)
 	{
 	  waterMode = MODE_WATER_AUTOMATIC;
+	}
+      }
+      else if(inputString.indexOf("sprinkler1") != -1) 
+      {
+	String subCmd = inputString.substring(inputString.indexOf(",")+1, inputString.length());
+
+	if(subCmd.indexOf("off") != -1)
+	{
+	  digitalWrite(SPRINKLER_1_CONTROL_PIN, LOW);
+	  sprinkler1State = STATE_WATER_OFF;
+	}
+	else if(subCmd.indexOf("on") != -1)
+	{
+	  digitalWrite(SPRINKLER_1_CONTROL_PIN, HIGH);
+	  sprinkler1State = STATE_WATER_ON;
+	}
+      }
+      else if(inputString.indexOf("sprinkler2") != -1) 
+      {
+	String subCmd = inputString.substring(inputString.indexOf(",")+1, inputString.length());
+
+	if(subCmd.indexOf("off") != -1)
+	{
+	  digitalWrite(SPRINKLER_2_CONTROL_PIN, LOW);
+	  sprinkler2State = STATE_WATER_OFF;
+	}
+	else if(subCmd.indexOf("on") != -1)
+	{
+	  digitalWrite(SPRINKLER_2_CONTROL_PIN, HIGH);
+	  sprinkler2State = STATE_WATER_ON;
 	}
       }
 
@@ -260,18 +314,37 @@ void loop(void) {
     long time = millis();
 
     //######### SERIAL SEND ################
-    Serial.print("{ph,"); Serial.print(phStr); Serial.println("}.");
+    if(phStr.length() == 5)
+    {
+      Serial.print("{ph,"); Serial.print(phStr); Serial.println("}.");
+    }
     Serial.print("{temp,"); Serial.print(tempStr); Serial.println("}.");
     Serial.print("{flow,"); Serial.print(litersStr); Serial.print(","); Serial.print(flowPulses, DEC); Serial.println("}.");
     Serial.print("{level,"); Serial.print(levelStr); Serial.println("}.");
 
-    Serial.print("{water,"); 
-    if (waterMode==MODE_WATER_AUTOMATIC) 
-      Serial.print("auto");
+    Serial.print("{auto_level,"); 
+    if (waterMode == MODE_WATER_AUTOMATIC) 
+      Serial.print("on");
     else 
-      Serial.print("manual");
-    Serial.print(",");
+      Serial.print("off");
+    Serial.println("}.");
+
+    Serial.print("{water,"); 
     if (waterState==STATE_WATER_ON) 
+      Serial.print("on");
+    else 
+      Serial.print("off");
+    Serial.println("}.");
+
+    Serial.print("{sprinkler1,"); 
+    if (sprinkler1State==STATE_WATER_ON) 
+      Serial.print("on");
+    else 
+      Serial.print("off");
+    Serial.println("}.");
+
+    Serial.print("{sprinkler2,"); 
+    if (sprinkler2State==STATE_WATER_ON) 
       Serial.print("on");
     else 
       Serial.print("off");
