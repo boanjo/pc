@@ -27,4 +27,6 @@ All sensors are located close to the pond naturaly. The concrete box is partly p
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
+And YES, the Koi fishes like it too :-) !
+
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
