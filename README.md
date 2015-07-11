@@ -30,8 +30,8 @@ The PH circuit i use required it's own breadboard so i placed that out near the 
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
-If you look really careful the hose that fills the water level is visible to the left of the waterfall. I.e. when draining the pond via (back flushing the filter out in the garden) fresh water is filled from the opposite side of the pond.
+If you look really careful the hose that fills the water level is visible to the left of the waterfall. I.e. when draining the pond (back flushing the filter out in the garden) fresh water is filled from the opposite side of the pond.
 
-Oh and YES! The Koi fishes like it too :-)
+Oh and YES! The Koi fishes loves the automation too :-)
 
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
