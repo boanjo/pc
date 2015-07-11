@@ -27,6 +27,7 @@ All sensors are located close to the pond naturaly. The concrete box is partly p
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
-And YES, the Koi fishes like it too :-) !
+If you look really careful the hose that fills the water level is visible to the left of the waterfall. The water is controlled with a standard solenoid like this () 
+Oh and YES! The Koi fishes like it too :-)
 
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
