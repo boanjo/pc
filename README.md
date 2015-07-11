@@ -22,12 +22,16 @@ All sensors are located close to the pond naturaly. The concrete box is partly p
 
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_2.jpg?raw=true "Sensor location")
 
+No, it's not the prettiest construction i've made but it does the job. The top shield contains 3 TIP120 power FETs to open the water flow to these solenoids (http://www.adafruit.com/products/997). One for the water fill and 2 spinkler systems (http://www.gardena.com/int/water-management/micro-drip-irrigation-system/)
 
 ![Arduino ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_1.jpg?raw=true "Arduino")
 
+The PH circuit i use required it's own breadboard so i placed that out near the water. Otherwise it is mainly a hub for all the sensors and fish feeder
+
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
-If you look really careful the hose that fills the water level is visible to the left of the waterfall. The water is controlled with a standard solenoid like this () 
+If you look really careful the hose that fills the water level is visible to the left of the waterfall. I.e. when draining the pond via (back flushing the filter out in the garden) fresh water is filled from the opposite side of the pond.
+
 Oh and YES! The Koi fishes like it too :-)
 
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
