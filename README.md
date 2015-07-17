@@ -30,7 +30,7 @@ The PH circuit i use required it's own breadboard so i placed that out near the 
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
-Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values. The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc) and can be followed here http://www.epkboan.net/pc/ph.php
+Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc) and can be followed here http://www.epkboan.net/pc/ph.php
 
 ![WEB gui](https://github.com/epkboan/epkboan.github.io/blob/master/pc_main.png?raw=true "The web gui")
 
