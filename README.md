@@ -30,6 +30,13 @@ The PH circuit i use required it's own breadboard so i placed that out near the 
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
+Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values. The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). 
+![WEB gui](https://github.com/epkboan/epkboan.github.io/blob/master/pc_main.png?raw=true "The web gui")
+
+The feeding time and sprinklers can be configured (drop down menu button). 
+![Timers](https://github.com/epkboan/epkboan.github.io/blob/master/pc_zoom.png?raw=true "Programmable timers for feeding and sprinklers")
+
+
 If you look really careful the hose that fills the water level is visible to the left of the waterfall. I.e. when draining the pond (back flushing the filter out in the garden) fresh water is filled from the opposite side of the pond.
 
 Oh and YES! The Koi fishes loves the automation too :-)
