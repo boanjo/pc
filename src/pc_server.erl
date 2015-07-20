@@ -52,7 +52,7 @@ init([]) ->
 check_devices_for_timers([]) ->
     ok;
 check_devices_for_timers([Device|Devices]) ->
-    {Id, _Name, List} = Device,
+    {Id, _Type, _Name, List} = Device,
     start_timers(Id, List),
     check_devices_for_timers(Devices).
 
@@ -110,9 +110,13 @@ lookup(Table, Id) ->
     end.
 
 
-device(Id, Action) ->
+device(Id, Action) when is_atom(Action) ->
     send_to_serial("{" ++ atom_to_list(Id) ++ "," 
-    		   ++ atom_to_list(Action) ++ "}").
+    		   ++ atom_to_list(Action) ++ "}");
+
+device(Id, Action) when is_list(Action) ->
+    send_to_serial("{" ++ atom_to_list(Id) ++ "," 
+    		   ++ Action ++ "}").
 
 get_sensor(Id) ->
     lookup(sensor_table, Id).

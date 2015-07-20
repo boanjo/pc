@@ -85,6 +85,7 @@ body() ->
 	"Flow :  ",#span{style="font-size: 35px; font-weight: bold;", id=flowspan},
 	#p{}
     ],
+
     
     Devices = create_device(WantedDeviceList, []),
 
@@ -147,37 +148,62 @@ create_device([], Acc) ->
 
 create_device([Head|Tail], Acc) ->
 
-    {Id, Name, AlarmList} = Head,   
+    {Id, Type, Name, AlarmList} = Head,   
 
     Device = pc_server:get_device(Id),
 
     NewName = xmlencode(Name, []),
 
-    ListElement = [#label { text=NewName, html_encode=false },
-		   #table { rows=[
-				  #tablerow { 
-				     cells=[
-					    #tablecell { 
-					       body =[
-						      #mobile_toggle{
-							 on_text="on",
-							 off_text="off",
-
-							 selected=map_state(Device#device.state),
-							 postback={button, Id},
-							 id=Id,
-							 width=100
-							}]},
-					    add_alarm_cell(Id, AlarmList),
-					    add_alarm_menu(Id, AlarmList)
-					    
-					   ]
-				    }
-				 ]
-			  },
-		   
-		   #hr{}],
+    ListElement = case Type of
+	button ->
+	    [#label { text="", html_encode=false },
+		#table { rows=[
+		    #tablerow { 
+			cells=[
+			    #tablecell { 
+				body =[
+					#button{
+					text=NewName,
+					postback={click_feed, Id},
+					id=Id}
+			    ]},
+			    add_alarm_cell(Id, AlarmList),
+			    add_alarm_menu(Id, AlarmList)
+			    
+			]
+		    }
+		]
+		},
+		
+		#hr{}];
+	toggle ->
+	    [#label { text=NewName, html_encode=false },
+		#table { rows=[
+		    #tablerow { 
+			cells=[
+			    #tablecell { 
+				body =[
+				    #mobile_toggle{
+					on_text="on",
+					off_text="off",
+					
+					selected=map_state(Device#device.state),
+					postback={button, Id},
+					id=Id,
+					width=200}]},
+			    add_alarm_cell(Id, AlarmList),
+			    add_alarm_menu(Id, AlarmList)
+			    
+			]
+		    }
+		]
+		},
+		
+		#hr{}]
+    end,
     create_device(Tail, [ListElement|Acc]).
+
+
 
 event({button, Id}) 
   when is_atom(Id)->
@@ -193,6 +219,9 @@ event({click, Button, Id}) ->
         "on" -> wf:wire(list_to_atom("alarm_menu" ++ integer_to_list(Id)),#slide_down{});
         _Other -> wf:wire(list_to_atom("alarm_menu" ++ integer_to_list(Id)),#slide_up{})
     end;
+
+event({click_feed, _Button}) ->
+    pc_server:device(feed, "40");
 
 event(Other) ->    
     error_logger:info_msg("Other ~p~n", [Other]).
