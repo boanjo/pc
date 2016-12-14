@@ -21,7 +21,6 @@ All sensors are located close to the pond naturaly. The concrete box is partly p
 - The temperature sensor (http://www.adafruit.com/products/381)
 
 ![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_2.jpg?raw=true "Sensor location")
-![The pond 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors")
 
 No, it's not the prettiest construction i've made but it does the job. The top shield contains 3 TIP120 power FETs to open the water flow to these solenoids (http://www.adafruit.com/products/997). One for the water fill and 2 spinkler systems (http://www.gardena.com/int/water-management/micro-drip-irrigation-system/)
 
@@ -31,6 +30,7 @@ No, it's not the prettiest construction i've made but it does the job. The top s
 The PH circuit i use required it's own breadboard so i placed that out near the water. Otherwise it is mainly a hub for all the sensors and fish feeder
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
+![Sensors 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
 
 Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc) and can be followed here http://www.epkboan.net/pc/ph.php
 
