@@ -26,7 +26,9 @@ No, it's not the prettiest construction i've made but it does the job. The top s
 
 ![Arduino ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_mess.jpg?raw=true "Arduino")
 ![Arduino 2 ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_base_unit.jpg?raw=true "Base Unit")
+
 Standard ethernet (RJ-45) cables running in an underground tube from the base unit out to the sensors (by the waterside) or the sprinklers / water fill/flow measurement. And another RJ-45 cable to the closest switch in the house for.
+
 ![Sensors 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
 
 The PH circuit i use required it's own breadboard so i placed that out near the water. Otherwise it is mainly a hub for all the sensors and fish feeder
