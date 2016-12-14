@@ -26,11 +26,11 @@ No, it's not the prettiest construction i've made but it does the job. The top s
 
 ![Arduino ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_mess.jpg?raw=true "Arduino")
 ![Arduino 2 ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_base_unit.jpg?raw=true "Base Unit")
+![Sensors 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
 
 The PH circuit i use required it's own breadboard so i placed that out near the water. Otherwise it is mainly a hub for all the sensors and fish feeder
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
-![Sensors 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
 
 Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc) and can be followed here http://www.epkboan.net/pc/ph.php
 
