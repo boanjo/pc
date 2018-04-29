@@ -42,8 +42,8 @@ float celsius = 0.0;
 String inputString = "";         // a string to hold incoming data
 String phInput = ""; 
 String phStr = ""; 
-long waterLevelLow = 100;
-long waterLevelHigh = 110;
+long waterLevelLow = 80;
+long waterLevelHigh = 95;
 
 
 volatile uint32_t flowPulses = 0;
@@ -292,6 +292,18 @@ void loop(void) {
       }
 
       waterLevelAvg = waterLevelAvg / NO_OF_LEVEL_AVERAGE_ITEMS;
+
+      // The etape is only supposed to read values starting from 1 inch (i.e. 25.4mm) so how
+      // can we get lower values? And beyond 8*25.4 should not be possible either
+      // Lets turn off water and auto just to not overfill. Something is wrong....
+      if((waterLevelAvg < 15) || (waterLevelAvg > 200)) 
+      {
+	waterMode = MODE_WATER_MANUAL;
+
+	digitalWrite(WATER_CONTROL_PIN, LOW);
+	waterState = STATE_WATER_OFF;
+      }
+
 
       if(waterMode == MODE_WATER_AUTOMATIC)
       {
