@@ -35,7 +35,17 @@ The PH circuit i use required it's own breadboard so i placed that out near the 
 
 ![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
-Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc) and can be followed here http://www.epkboan.net/pc/ph.php
+Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc)
+
+Here are some sketches of how te fishfeeder works. Most of the material can be obtained at your closest IKEA. I've chosen to put in some tupperware similar box (which is then both a container for the fish pellets (2-3 mm granulat) and the feeding device). The rotating cylinder is a roll (yes, like the one you use for your ginger breads!) with a DC servo connected to it.
+
+![Overview](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_overview.png?raw=true "Feeder overview")
+
+![Front](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_front.png?raw=true "Feeder Front")
+
+![Top](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_top.png?raw=true "Feeder Top")
+
+![Bottom](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_bottom.png?raw=true "Feeder Bottom")
 
 ![WEB gui](https://github.com/epkboan/epkboan.github.io/blob/master/pc_main.png?raw=true "The web gui")
 
