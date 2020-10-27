@@ -12,7 +12,7 @@ Features:
 - Fish feeder
 - Webserver running a mobile friendly UI to monitor and control the system
 
-![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_0.jpg?raw=true "The Pond under control")
+![The pond](https://github.com/epkboan/boanjo.github.io/blob/master/pond_0.jpg?raw=true "The Pond under control")
 
 All sensors are located close to the pond naturaly. The concrete box is partly placed above the water for the fish feeder and the sensors.
 - Fish feeder for pellets (home made with a continous rotating servo like this http://www.adafruit.com/products/2442)
@@ -20,42 +20,42 @@ All sensors are located close to the pond naturaly. The concrete box is partly p
 - The liquid eTape ruler (http://www.adafruit.com/products/464) to measure the level (i keep a +/-5mm level) 
 - The temperature sensor (http://www.adafruit.com/products/381)
 
-![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_2.jpg?raw=true "Sensor location")
+![The pond](https://github.com/epkboan/boanjo.github.io/blob/master/pond_2.jpg?raw=true "Sensor location")
 
 No, it's not the prettiest construction i've made but it does the job. The top shield contains 3 TIP120 power FETs to open the water flow to these solenoids (http://www.adafruit.com/products/997). One for the water fill and 2 spinkler systems (http://www.gardena.com/int/water-management/micro-drip-irrigation-system/)
 
-![Arduino ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_mess.jpg?raw=true "Arduino")
-![Arduino 2 ](https://github.com/epkboan/epkboan.github.io/blob/master/pc_base_unit.jpg?raw=true "Base Unit")
+![Arduino ](https://github.com/epkboan/boanjo.github.io/blob/master/pc_mess.jpg?raw=true "Arduino")
+![Arduino 2 ](https://github.com/epkboan/boanjo.github.io/blob/master/pc_base_unit.jpg?raw=true "Base Unit")
 
 Standard ethernet (RJ-45) cables running in an underground tube from the base unit out to the sensors (by the waterside) or the sprinklers / water fill/flow measurement. And another RJ-45 cable to the closest switch in the house for.
 
-![Sensors 2](https://github.com/epkboan/epkboan.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
+![Sensors 2](https://github.com/epkboan/boanjo.github.io/blob/master/pc_sensors.jpg?raw=true "Sensors 2")
 
 The PH circuit i use required it's own breadboard so i placed that out near the water. Otherwise it is mainly a hub for all the sensors and fish feeder
 
-![Sensors](https://github.com/epkboan/epkboan.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
+![Sensors](https://github.com/epkboan/boanjo.github.io/blob/master/pc_2.jpg?raw=true "Sensors")
 
 Here are some sketches of how te fishfeeder works. Most of the material can be obtained at your closest IKEA. I've chosen to put in some tupperware similar box (which is then both a container for the fish pellets (2-3 mm granulat) and the feeding device). The rotating cylinder is a roll (yes, like the one you use for your ginger breads!) with a DC servo connected to it.
 
-![Overview](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_overview.png?raw=true "Feeder overview")
+![Overview](https://github.com/epkboan/boanjo.github.io/blob/master/pc_feeder_overview.png?raw=true "Feeder overview")
 
-![Front](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_front.png?raw=true "Feeder Front")
+![Front](https://github.com/epkboan/boanjo.github.io/blob/master/pc_feeder_front.png?raw=true "Feeder Front")
 
-![Top](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_top.png?raw=true "Feeder Top")
+![Top](https://github.com/epkboan/boanjo.github.io/blob/master/pc_feeder_top.png?raw=true "Feeder Top")
 
-![Bottom](https://github.com/epkboan/epkboan.github.io/blob/master/pc_feeder_bottom.png?raw=true "Feeder Bottom")
+![Bottom](https://github.com/epkboan/boanjo.github.io/blob/master/pc_feeder_bottom.png?raw=true "Feeder Bottom")
 
 Instead of writing a specific android or iphone app i've chosen to make a web gui with the jQuery mobile look. Below is the simple web gui to interact and watch the sensor values (page is updated as soon as a new sensor value is available and pushed to the web client, typically once every second). The web server runs on a raspberry PI which can be accessed from any device (LAN and WAN). All the sensor values are pushed to a mysql database once every 15 minutes to create statistics over time (ph, temp, flow etc)
 
-![WEB gui](https://github.com/epkboan/epkboan.github.io/blob/master/pc_main.png?raw=true "The web gui")
+![WEB gui](https://github.com/epkboan/boanjo.github.io/blob/master/pc_main.png?raw=true "The web gui")
 
 The feeding time and sprinklers can be configured (drop down menu button). 
 
-![Timers](https://github.com/epkboan/epkboan.github.io/blob/master/pc_zoom.png?raw=true "Programmable timers for feeding and sprinklers")
+![Timers](https://github.com/epkboan/boanjo.github.io/blob/master/pc_zoom.png?raw=true "Programmable timers for feeding and sprinklers")
 
 
 If you look really careful the hose that fills the water level is visible to the left of the waterfall. I.e. when draining the pond (back flushing the filter out in the garden) fresh water is filled from the opposite side of the pond.
 
 Oh and YES! The Koi fishes loves the automation too :-)
 
-![The pond](https://github.com/epkboan/epkboan.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
+![The pond](https://github.com/epkboan/boanjo.github.io/blob/master/pond_1.jpg?raw=true "The Pond at control")
